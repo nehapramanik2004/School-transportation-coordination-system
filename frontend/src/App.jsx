@@ -37,9 +37,11 @@ export default function App() {
     let active = true;
     (async () => {
       try {
-        const [mode, result] = await Promise.all([getAuthMode().catch(() => ({ demoLoginAvailable: false })), getSession()]);
+        const mode = await getAuthMode();
         if (!active) return;
         setDemoModeAvailable(mode.demoLoginAvailable);
+        const result = await getSession();
+        if (!active) return;
         if (result.user) {
           setSession(result.user);
           if (result.user.studentId) setChildId(result.user.studentId);
@@ -50,7 +52,12 @@ export default function App() {
           try { const workspace = await loadWorkspace(); if (active) { setData(workspace); setLoadError(''); } }
           catch (error) { if (active) setLoadError(error.message); }
         }
-      } catch (error) { if (active) setAuthError(error.message); }
+      } catch (error) {
+        if (active) {
+          setAuthError(error.message);
+          setLoadError(error.message);
+        }
+      }
       finally { if (active) setAuthLoading(false); }
     })();
     return () => { active = false; };
@@ -147,7 +154,7 @@ export default function App() {
 
   let content;
   if (page === 'login') content = <Login onLogin={handleLogin} demoMode={demoModeAvailable} initialError={authError}/>;
-  else if (!data) content = <section className="panel connection-error"><div className="panel-title">Dashboard is ready when the API is available</div><p>{loadError || 'The API has not returned workspace data.'}</p><div className="heading-actions"><button className="button button-primary" onClick={refresh}>Retry dashboard</button><button className="button" onClick={() => setPage('login')}>Open Login</button></div></section>;
+  else if (!data) content = <section className="panel connection-error"><div className="panel-title">Dashboard is ready when the API is available</div><p>{loadError || authError || 'The API has not returned workspace data.'}</p><div className="heading-actions"><button className="button button-primary" onClick={refresh}>Retry dashboard</button><button className="button" onClick={() => setPage('login')}>Open Login</button></div></section>;
   else if (page === 'overview') content = <Overview role={role} data={data} childId={childId} setChildId={setChildId} driverId={driverId} setDriverId={setDriverId} notify={notify} mutate={mutate} openDialog={openDialog}/>;
   else if (['students','drivers','routes'].includes(page) && role === 'admin') content = <Management page={page} data={data} openDialog={openDialog} mutate={mutate}/>;
   else if (page === 'trips') content = <Trips data={data} role={role} openDialog={openDialog} mutate={mutate}/>;

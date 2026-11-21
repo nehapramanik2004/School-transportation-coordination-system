@@ -5,7 +5,7 @@ const workspaceLinks = [
   ['overview', 'Overview', 'grid'], ['live-tracking', 'Live tracking', 'map'],
   ['trips', 'Trips', 'route'], ['students', 'Students', 'users'],
   ['drivers', 'Drivers & buses', 'steering'], ['routes', 'Routes', 'pin'],
-  ['notifications', 'Notifications', 'bell'], ['login', 'Login', 'users']
+  ['notifications', 'Notifications', 'bell'], ['login', 'Demo Preview', 'users']
 ];
 
 export default function AppShell({ page, role, profileName = 'Dashboard Preview', profileLabel = 'DEMO DASHBOARD PREVIEW', unread, trackingCount = 0, isSignedIn = false, onNavigate, onLogout, children }) {
@@ -29,7 +29,7 @@ export default function AppShell({ page, role, profileName = 'Dashboard Preview'
       <div className="sidebar-spacer"/>
       <div className="safety-card"><div className="safety-top"><span className="safety-shield"><Icon name="shield"/></span><span className="status-live">● SYSTEM OK</span></div><b>Every ride, accounted for.</b><p>Student safety is always in motion.</p></div>
       <button className="profile-card" onClick={() => window.dispatchEvent(new CustomEvent('app-toast', { detail: `Signed in as ${profileName}.` }))}><span className="avatar avatar-navy">{profileInitials}</span><span className="profile-copy"><b>{profileName}</b><small>{profileLabel}</small></span><span className="more">···</span></button>
-      {isSignedIn ? <button className="signout-link" onClick={onLogout}><Icon name="logout"/><span>Sign out</span></button> : <button className="signout-link" onClick={() => navigate('login')}><Icon name="users"/><span>Demo Login</span></button>}
+      {isSignedIn ? <button className="signout-link" onClick={onLogout}><Icon name="logout"/><span>Sign out</span></button> : <button className="signout-link" onClick={() => navigate('login')}><Icon name="users"/><span>Demo Preview</span></button>}
     </aside>
     <main className="main-area">
       <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(value => !value)} aria-label="Toggle navigation"><Icon name="menu"/></button><div className="breadcrumbs"><span>Workspace</span><span className="crumb-divider">/</span><b>{title}</b></div><div className="top-actions"><div className="demo-badge"><span/> DEMO DATA</div><span className="account-role">{role[0].toUpperCase()}{role.slice(1)} account</span><button className="icon-button notification-button" aria-label="Notifications" onClick={() => navigate('notifications')}><Icon name="bell"/>{unread > 0 && <i/>}</button><div className="top-divider"/><div className="today-label">{new Date().toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}</div><span className="avatar avatar-navy top-avatar">{profileInitials}</span></div></header>

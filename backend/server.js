@@ -14,8 +14,13 @@ dotenv.config({ path: path.resolve(here, '../.env.local'), override: false, quie
 export function createApp() {
   validateAuthConfiguration();
   const app = express();
+  const configuredOrigins = (process.env.FRONTEND_ORIGIN || '')
+    .split(',').map(origin => origin.trim().replace(/\/+$/, '')).filter(Boolean);
+  const allowedOrigins = configuredOrigins.length
+    ? configuredOrigins
+    : process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5173'];
   app.disable('x-powered-by');
-  app.use(cors({ origin: process.env.FRONTEND_ORIGIN?.split(',') || ['http://localhost:5173'], credentials: true }));
+  app.use(cors({ origin: allowedOrigins, credentials: true }));
   app.use(express.json({ limit: '100kb' }));
   app.get('/', (req, res) => res.json({ name: 'Northview School Transport API', docs: '/api/health' }));
   app.use('/api', api);

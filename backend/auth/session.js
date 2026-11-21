@@ -33,9 +33,21 @@ function configuredAccounts() {
 
 export function validateAuthConfiguration() {
   if (process.env.NODE_ENV !== 'production') return;
-  const required = ['AUTH_SESSION_SECRET', 'AUTH_ADMIN_EMAIL', 'AUTH_ADMIN_PASSWORD', 'AUTH_PARENT_EMAIL', 'AUTH_PARENT_PASSWORD', 'AUTH_PARENT_STUDENT_ID', 'AUTH_DRIVER_EMAIL', 'AUTH_DRIVER_PASSWORD', 'AUTH_DRIVER_ID'];
+  const required = ['AUTH_SESSION_SECRET', 'FRONTEND_ORIGIN'];
+  if (process.env.DEMO_LOGIN !== 'true') {
+    required.push('AUTH_ADMIN_EMAIL', 'AUTH_ADMIN_PASSWORD', 'AUTH_PARENT_EMAIL', 'AUTH_PARENT_PASSWORD', 'AUTH_PARENT_STUDENT_ID', 'AUTH_DRIVER_EMAIL', 'AUTH_DRIVER_PASSWORD', 'AUTH_DRIVER_ID');
+  }
   const missing = required.filter(key => !process.env[key]);
+  const frontendOrigins = (process.env.FRONTEND_ORIGIN || '').split(',').map(origin => origin.trim().replace(/\/+$/, '')).filter(Boolean);
+  if (!frontendOrigins.length && !missing.includes('FRONTEND_ORIGIN')) missing.push('FRONTEND_ORIGIN');
   if (missing.length) throw new Error(`Production authentication is missing configuration: ${missing.join(', ')}`);
+  const invalidOrigin = frontendOrigins.some(origin => {
+    try {
+      const parsed = new URL(origin);
+      return !['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== origin;
+    } catch { return true; }
+  });
+  if (invalidOrigin) throw new Error('FRONTEND_ORIGIN must contain comma-separated HTTP or HTTPS origins without paths.');
   if (process.env.AUTH_SESSION_SECRET.length < 32) throw new Error('AUTH_SESSION_SECRET must be at least 32 characters.');
 }
 
@@ -55,12 +67,12 @@ function equalStrings(left, right) {
 }
 
 function setSessionCookie(res, token) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; Path=/api; HttpOnly; SameSite=Lax; Max-Age=${SESSION_SECONDS}${secure}`);
+  const sameSite = process.env.NODE_ENV === 'production' ? '; Secure; SameSite=None' : '; SameSite=Lax';
+  res.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; Path=/api; HttpOnly${sameSite}; Max-Age=${SESSION_SECONDS}`);
 }
 
 export function demoLoginAvailable() {
-  return process.env.NODE_ENV !== 'production' && process.env.DEMO_LOGIN !== 'false';
+  return process.env.DEMO_LOGIN === 'true' || (process.env.NODE_ENV !== 'production' && process.env.DEMO_LOGIN !== 'false');
 }
 
 function establishSession(user, res) {
@@ -70,8 +82,8 @@ function establishSession(user, res) {
 }
 
 export function clearSessionCookie(res) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/api; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT${secure}`);
+  const sameSite = process.env.NODE_ENV === 'production' ? '; Secure; SameSite=None' : '; SameSite=Lax';
+  res.setHeader('Set-Cookie', `${COOKIE_NAME}=; Path=/api; HttpOnly${sameSite}; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`);
 }
 
 function cookieFromRequest(req) {
@@ -114,7 +126,7 @@ export function demoLogin(req, res) {
   const password = String(req.body?.password || '');
   if (!['admin', 'parent', 'driver'].includes(role)) throw new HttpError(400, 'Choose Admin, Parent, or Driver.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new HttpError(400, 'Enter a valid email address.');
-  if (!password.trim()) throw new HttpError(400, 'Enter a non-empty password.');
+  if (!password) throw new HttpError(400, 'Enter a non-empty password.');
 
   const name = email.split('@')[0].replace(/[._+-]+/g, ' ').replace(/\b\w/g, letter => letter.toUpperCase());
   const user = {

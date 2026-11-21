@@ -73,15 +73,27 @@ Create a Render **Web Service** from this repository with these settings:
 | Build Command | `npm ci` |
 | Start Command | `npm run start --workspace backend` |
 
-Render supplies `PORT`; the API binds to `0.0.0.0` on that port. Set `NODE_ENV=production` and `DATA_STORE=json` for a safe initial deployment. Also set `FRONTEND_ORIGIN` to the deployed frontend origin and configure the production authentication variables listed above (`AUTH_SESSION_SECRET`, the admin/parent/driver email and password variables, `AUTH_PARENT_STUDENT_ID`, and `AUTH_DRIVER_ID`). Use Render's environment settings for credentials; never commit them to `.env`, `.env.local`, or source control. Render-managed filesystem data is not durable across service replacement, so JSON mode is suitable for a deployment preview, not durable production records.
+Render supplies `PORT`; the API binds to `0.0.0.0` on that port. For a preview deployment, set `NODE_ENV=production`, `DATA_STORE=json`, `DEMO_LOGIN=true`, `FRONTEND_ORIGIN` to the exact Vercel site origin (comma-separated origins are supported), and a private `AUTH_SESSION_SECRET` of at least 32 characters. Demo preview does not require configured account passwords. Keep the session secret in Render's environment settings and never commit it. Render's filesystem is not durable across service replacement, so JSON mode is suitable for a preview, not durable production records.
 
 Do not set `DATA_STORE=postgres` or attach a production `DATABASE_URL` yet. The current Neon adapter is deliberately restricted to the isolated testing branch, and its save operation truncates and rebuilds the application tables. Production Neon deployment needs a non-destructive persistence adapter and a separately reviewed data migration. The Render service can be deployed in JSON preview mode without connecting to Neon.
 
+## Vercel frontend deployment
+
+Configure the Vercel project to build from the repository root so it uses the root npm workspace lockfile:
+
+| Setting | Value |
+|---|---|
+| Root Directory | `.` |
+| Build Command | `npm run build --workspace frontend` |
+| Output Directory | `frontend/dist` |
+
+Add the public frontend build variable `VITE_API_URL` with the Render service URL ending in `/api`, for example `https://your-service.onrender.com/api`. This is a public API address, not a secret. Redeploy the frontend after changing it. In Render, set `FRONTEND_ORIGIN` to the matching Vercel origin (for example, `https://your-project.vercel.app`) so credentialed API requests are accepted. Production session cookies use `SameSite=None; Secure` for the cross-site Vercel-to-Render request.
+
 ## Dashboard and demo login
 
-The dashboard opens first. In local/demo mode, the sidebar's **Login** entry opens **DEMO LOGIN**. Select Admin, Parent, or Driver, enter any valid-format email and any non-empty password, and the selected role dashboard opens. This is a role preview for the hackathon demo; it does not verify identity. Parent and Driver previews use the configured demo student and driver records.
+The dashboard opens first. In local/demo mode, the sidebar's **Demo Preview** entry opens the role preview. Select Admin, Parent, or Driver, enter any valid-format email and any non-empty password, and the selected role dashboard opens. This does not verify identity. Parent and Driver previews use the demo student and driver records.
 
-The demo bypass is unavailable when `NODE_ENV=production`; it can also be disabled in other environments with `DEMO_LOGIN=false`. Production users must use configured accounts through the regular sign-in endpoint. Sessions use signed, HttpOnly cookies. Configure `AUTH_ADMIN_EMAIL`, `AUTH_ADMIN_PASSWORD`, `AUTH_ADMIN_NAME`, `AUTH_PARENT_EMAIL`, `AUTH_PARENT_PASSWORD`, `AUTH_PARENT_NAME`, `AUTH_PARENT_STUDENT_ID`, `AUTH_DRIVER_EMAIL`, `AUTH_DRIVER_PASSWORD`, `AUTH_DRIVER_NAME`, and `AUTH_DRIVER_ID` in the API environment. Production also requires a private `AUTH_SESSION_SECRET` of at least 32 characters.
+Demo preview is enabled by default outside production, can be disabled with `DEMO_LOGIN=false`, and can be explicitly enabled in production with `DEMO_LOGIN=true`. Preview login accepts a valid-format email and any non-empty password; it does not verify or store credentials. For real sign-in instead, keep `DEMO_LOGIN` disabled and configure `AUTH_ADMIN_EMAIL`, `AUTH_ADMIN_PASSWORD`, `AUTH_ADMIN_NAME`, `AUTH_PARENT_EMAIL`, `AUTH_PARENT_PASSWORD`, `AUTH_PARENT_NAME`, `AUTH_PARENT_STUDENT_ID`, `AUTH_DRIVER_EMAIL`, `AUTH_DRIVER_PASSWORD`, `AUTH_DRIVER_NAME`, and `AUTH_DRIVER_ID`. Production sessions use a private `AUTH_SESSION_SECRET` of at least 32 characters.
 
 ## Main workflows
 
