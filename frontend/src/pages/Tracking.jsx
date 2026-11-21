@@ -1,0 +1,6 @@
+import Icon from '../components/Icon.jsx';
+import { Heading, MapIllustration, PanelTitle, StatusChip, currentTrip, getBus, getDriver } from '../components/UI.jsx';
+
+export default function Tracking({ data }) {
+  return <><Heading title="Live tracking" description="Route overview from the current demo workspace."/><section className="content-grid"><article className="panel tracking-panel"><MapIllustration/><div className="notice"><Icon name="alert"/> This is a sample route illustration. There is no live GPS feed connected.</div></article><article className="panel"><PanelTitle title="Vehicles on route" subtitle="Demo run status from local records"/><div className="activity-list">{data.routes.map(route => { const bus = getBus(data, route), driver = getDriver(data, route), trip = currentTrip(data, route.id); return <div className="activity-row" key={route.id}><span className="activity-symbol symbol-info"><Icon name="bus"/></span><div className="activity-copy"><b>{bus?.label || 'Bus'} · {route.name}</b><small>{driver?.name || 'Driver unassigned'} · {trip?.eta ? `ETA ${trip.eta}` : 'Not started'}</small></div><StatusChip status={trip?.status || 'Scheduled'}/></div>; })}</div></article></section></>;
+}

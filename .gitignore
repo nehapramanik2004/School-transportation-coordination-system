@@ -1,0 +1,7 @@
+node_modules/
+frontend/dist/
+backend/data/db.json.tmp
+.neon
+.env.local
+
+backend/.env

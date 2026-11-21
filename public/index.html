@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f9fe">
+  <title>Northview · School transport</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#overview" aria-label="Northview home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 15.5 16 6l11 9.5V27H5z"/><path d="M12 27v-8h8v8M10 13h.01M16 13h.01M22 13h.01"/></svg></span>
+        <span><b>northview</b><small>TRANSPORT</small></span>
+      </a>
+      <div class="workspace"><span class="workspace-logo">N</span><span><b>Northview Academy</b><small>School workspace</small></span><span class="chevron">⌄</span></div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="main-nav" id="mainNav">
+        <a href="#overview" data-page="overview" class="nav-link active"><span class="nav-icon" data-icon="grid"></span><span>Overview</span></a>
+        <a href="#live-tracking" data-page="live-tracking" class="nav-link"><span class="nav-icon" data-icon="map"></span><span>Live tracking</span><span class="nav-pill">3</span></a>
+        <a href="#trips" data-page="trips" class="nav-link"><span class="nav-icon" data-icon="route"></span><span>Trips</span></a>
+        <a href="#students" data-page="students" class="nav-link"><span class="nav-icon" data-icon="users"></span><span>Students</span></a>
+        <a href="#drivers" data-page="drivers" class="nav-link"><span class="nav-icon" data-icon="steering"></span><span>Drivers & buses</span></a>
+        <a href="#routes" data-page="routes" class="nav-link"><span class="nav-icon" data-icon="pin"></span><span>Routes</span></a>
+        <a href="#notifications" data-page="notifications" class="nav-link"><span class="nav-icon" data-icon="bell"></span><span>Notifications</span><span class="nav-dot"></span></a>
+      </nav>
+      <div class="nav-label tools-label">PREFERENCES</div>
+      <nav class="main-nav"><a href="#settings" data-page="settings" class="nav-link"><span class="nav-icon" data-icon="settings"></span><span>Settings</span></a><a href="#help" data-page="help" class="nav-link"><span class="nav-icon" data-icon="help"></span><span>Help & support</span></a></nav>
+      <div class="sidebar-spacer"></div>
+      <div class="safety-card"><div class="safety-top"><span class="safety-shield" data-icon="shield"></span><span class="status-live">● SYSTEM OK</span></div><b>Every ride, accounted for.</b><p>Student safety is always in motion.</p></div>
+      <button class="profile-card" id="profileButton"><span class="avatar avatar-navy">PM</span><span class="profile-copy"><b>Priya Mehta</b><small>School administrator</small></span><span class="more">···</span></button>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar"><button class="mobile-menu" id="mobileMenu" aria-label="Toggle navigation"><span data-icon="menu"></span></button><div class="breadcrumbs"><span>Workspace</span><span class="crumb-divider">/</span><b id="crumbTitle">Overview</b></div><div class="top-actions"><div class="demo-badge"><span></span> DEMO DATA</div><select class="role-switch" id="roleSwitch" aria-label="Switch dashboard"><option value="admin">Admin view</option><option value="parent">Parent view</option><option value="driver">Driver view</option></select><button class="icon-button notification-button" id="topNotifications" aria-label="Notifications"><span data-icon="bell"></span><i></i></button><div class="top-divider"></div><div class="today-label" id="todayLabel"></div><span class="avatar avatar-navy top-avatar">PM</span></div></header>
+      <div class="page-wrap" id="pageContent"><div class="loading"><span class="spinner"></span> Loading your transport overview…</div></div>
+      <footer class="footer"><span>© 2026 Northview Academy</span><span><span class="green-dot"></span> All systems operational <span class="footer-sep">·</span> Demo mode</span></footer>
+    </main>
+  </div>
+  <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+  <div id="modalRoot"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>

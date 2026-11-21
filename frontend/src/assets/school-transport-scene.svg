@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" fill="none">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#d9ecff"/>
+      <stop offset="1" stop-color="#f4f9ff"/>
+    </linearGradient>
+    <linearGradient id="school" x1="650" y1="72" x2="930" y2="272" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fffaf1"/>
+      <stop offset="1" stop-color="#e8c99f"/>
+    </linearGradient>
+    <linearGradient id="bus" x1="260" y1="232" x2="650" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffd84f"/>
+      <stop offset="1" stop-color="#f4a91e"/>
+    </linearGradient>
+    <linearGradient id="hill" x1="200" y1="208" x2="940" y2="372" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#aedcc2"/>
+      <stop offset="1" stop-color="#74bd9a"/>
+    </linearGradient>
+    <filter id="shadow" x="180" y="220" width="530" height="172" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1000v400H0z"/>
+  <circle cx="852" cy="61" r="31" fill="#fff" fill-opacity=".64"/>
+  <path d="M0 212c119-47 207-43 316-4 119 43 204 13 302-27 126-51 229-50 382-5v224H0V212Z" fill="#c7e4f9"/>
+  <path d="M0 242c113-49 214-43 320-5 102 36 192 33 292-13 136-63 226-62 388-20v196H0V242Z" fill="url(#hill)"/>
+  <path d="M0 327c155-47 283-22 416 14 170 46 345 35 584-30v89H0v-73Z" fill="#dcecfb"/>
+  <!-- Northview Academy -->
+  <path d="M640 106 795 54l151 52v166H640V106Z" fill="url(#school)" stroke="#d8b889" stroke-width="4"/>
+  <path d="m622 107 173-68 170 68H622Z" fill="#bd7954"/>
+  <path d="M776 40h37v-22h-37z" fill="#bd7954"/>
+  <path d="M791 22v-15" stroke="#bd7954" stroke-width="5" stroke-linecap="round"/>
+  <path d="M640 131h306M640 211h306" stroke="#d9bd99" stroke-width="4"/>
+  <path d="M678 148h31v39h-31zM733 148h31v39h-31zM824 148h31v39h-31zM879 148h31v39h-31zM678 226h31v39h-31zM733 226h31v39h-31zM824 226h31v39h-31zM879 226h31v39h-31z" fill="#9fc8e2" stroke="#fff9ed" stroke-width="5"/>
+  <path d="M779 217h37v55h-37z" fill="#8d634b"/>
+  <path d="M764 112h61v19h-61z" fill="#fff8e9"/>
+  <text x="794" y="126" fill="#456587" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">NORTHVIEW</text>
+  <!-- Trees -->
+  <g fill="#438c6e">
+    <circle cx="606" cy="185" r="28"/><circle cx="592" cy="210" r="24"/><circle cx="619" cy="211" r="26"/>
+    <circle cx="958" cy="190" r="31"/><circle cx="940" cy="218" r="25"/><circle cx="971" cy="219" r="27"/>
+    <circle cx="720" cy="260" r="22"/><circle cx="706" cy="279" r="19"/><circle cx="731" cy="280" r="20"/>
+  </g>
+  <g fill="#74b78a"><circle cx="601" cy="177" r="15"/><circle cx="953" cy="180" r="17"/><circle cx="717" cy="254" r="13"/></g>
+  <g fill="#80634b"><path d="M598 218h10v30h-10zM953 225h10v34h-10zM716 282h8v22h-8z"/></g>
+  <!-- Road and a locally illustrated school bus -->
+  <path d="M0 365c176-26 286-16 420 8 183 34 349 25 580-23v50H0v-35Z" fill="#8ea5bd"/>
+  <path d="M0 382c199-20 320-6 455 12 204 27 343 13 545-22" stroke="#fff" stroke-opacity=".75" stroke-width="4" stroke-dasharray="25 20"/>
+  <ellipse cx="443" cy="357" rx="244" ry="19" fill="#17345b" fill-opacity=".22" filter="url(#shadow)"/>
+  <path d="M248 252c0-13 10-23 23-23h264c17 0 30 7 39 20l45 67v34H232v-75c0-13 6-23 16-23Z" fill="url(#bus)" stroke="#d58d1d" stroke-width="5"/>
+  <path d="M271 240h77v56h-77zM359 240h77v56h-77zM447 240h77v56h-77z" fill="#9ed1ec" stroke="#fff5cb" stroke-width="5"/>
+  <path d="M540 247c7 2 13 7 18 14l39 56h-57v-70Z" fill="#9ed1ec" stroke="#fff5cb" stroke-width="5"/>
+  <path d="M231 312h386v38H231z" fill="#f2a91e"/>
+  <path d="M252 322h320" stroke="#fff1b7" stroke-width="5"/>
+  <path d="M230 304h31v9h-31z" fill="#fff"/>
+  <path d="M605 309h14v19h-14z" fill="#e95445"/>
+  <path d="M211 286h21v35h-21z" fill="#f6bd2d"/>
+  <path d="M270 336h26v10h-26zM544 336h26v10h-26z" fill="#526b85"/>
+  <circle cx="306" cy="347" r="27" fill="#253d5a"/><circle cx="306" cy="347" r="13" fill="#dce7f1"/><circle cx="550" cy="347" r="27" fill="#253d5a"/><circle cx="550" cy="347" r="13" fill="#dce7f1"/>
+  <path d="M471 308h70v31h-70z" fill="#fff3c8"/>
+  <text x="506" y="321" fill="#334f70" font-family="Arial,sans-serif" font-size="10" font-weight="700" text-anchor="middle">SCHOOL</text>
+  <text x="506" y="333" fill="#334f70" font-family="Arial,sans-serif" font-size="8" font-weight="700" text-anchor="middle">BUS</text>
+  <path d="M205 350h431" stroke="#d88e1b" stroke-width="4" stroke-linecap="round"/>
+</svg>
