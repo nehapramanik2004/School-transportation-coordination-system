@@ -53,6 +53,15 @@ test('Admin trip assignment is available to the Driver after a fresh API load', 
     assert.equal(assignedRoute.busId, 'bus-3');
     assert.ok(adminWorkspace.trips.some(item => item.id === trip.id));
 
+    const addStudent = await call('/students', {
+      method: 'POST', headers: { cookie: adminCookie, 'content-type': 'application/json' },
+      body: JSON.stringify({ name: 'Session Check Student', grade: 'Grade 1', parent: 'Session Check Parent', phone: '+91 98765 00000', routeId: 'route-3', stop: 'Cedar Lane', pickup: '7:40 AM' })
+    });
+    const student = await addStudent.json();
+    assert.equal(addStudent.status, 201, 'Admin can add a student without a new sign-in');
+    const removeStudent = await call(`/students/${student.id}`, { method: 'DELETE', headers: { cookie: adminCookie } });
+    assert.equal(removeStudent.status, 200, 'same Admin session remains valid after the write');
+
     const driverCookie = await login('driver', 'driver@example.com');
     const workspaceResponse = await call('/bootstrap', { headers: { cookie: driverCookie } });
     assert.equal(workspaceResponse.status, 200);

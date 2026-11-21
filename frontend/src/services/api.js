@@ -1,7 +1,7 @@
 import { fetchWithRetry } from './fetchWithRetry.js';
 
 const configuredApiBase = import.meta.env.VITE_API_URL?.trim();
-const API_BASE = (configuredApiBase || (import.meta.env.DEV ? 'http://localhost:3000/api' : '')).replace(/\/+$/, '');
+const API_BASE = (import.meta.env.PROD ? '/api' : configuredApiBase || 'http://localhost:3000/api').replace(/\/+$/, '');
 
 export async function api(path, options = {}) {
   if (!API_BASE) {
