@@ -28,7 +28,7 @@ ensureDatabase();
 const app = createApp();
 const port = Number(process.env.PORT || 3000);
 if (process.env.NODE_ENV !== 'test') {
-  app.listen(port, () => console.log(`Northview Transport API listening at http://localhost:${port}`));
+  app.listen(port, '0.0.0.0', () => console.log(`Northview Transport API listening on port ${port}`));
 }
 
 export default app;

@@ -63,6 +63,20 @@ DATA_STORE=postgres npm run dev
 
 The API health endpoint reports the active storage. The Postgres adapter presents the same API model as the JSON store, including trip attendance and calculated route student totals. No production cutover or deployment is included.
 
+## Render backend deployment
+
+Create a Render **Web Service** from this repository with these settings:
+
+| Setting | Value |
+|---|---|
+| Root Directory | `.` (repository root; required for the npm workspace lockfile) |
+| Build Command | `npm ci` |
+| Start Command | `npm run start --workspace backend` |
+
+Render supplies `PORT`; the API binds to `0.0.0.0` on that port. Set `NODE_ENV=production` and `DATA_STORE=json` for a safe initial deployment. Also set `FRONTEND_ORIGIN` to the deployed frontend origin and configure the production authentication variables listed above (`AUTH_SESSION_SECRET`, the admin/parent/driver email and password variables, `AUTH_PARENT_STUDENT_ID`, and `AUTH_DRIVER_ID`). Use Render's environment settings for credentials; never commit them to `.env`, `.env.local`, or source control. Render-managed filesystem data is not durable across service replacement, so JSON mode is suitable for a deployment preview, not durable production records.
+
+Do not set `DATA_STORE=postgres` or attach a production `DATABASE_URL` yet. The current Neon adapter is deliberately restricted to the isolated testing branch, and its save operation truncates and rebuilds the application tables. Production Neon deployment needs a non-destructive persistence adapter and a separately reviewed data migration. The Render service can be deployed in JSON preview mode without connecting to Neon.
+
 ## Dashboard and demo login
 
 The dashboard opens first. In local/demo mode, the sidebar's **Login** entry opens **DEMO LOGIN**. Select Admin, Parent, or Driver, enter any valid-format email and any non-empty password, and the selected role dashboard opens. This is a role preview for the hackathon demo; it does not verify identity. Parent and Driver previews use the configured demo student and driver records.
