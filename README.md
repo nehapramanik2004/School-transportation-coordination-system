@@ -84,10 +84,11 @@ Configure the Vercel project to build from the repository root so it uses the ro
 | Setting | Value |
 |---|---|
 | Root Directory | `.` |
-| Build Command | `npm run build --workspace frontend` |
+| Install Command | `npm install` |
+| Build Command | `npm run build` |
 | Output Directory | `frontend/dist` |
 
-The root `vercel.json` pins the build command and output directory and rewrites SPA routes to the Vite `index.html`. Keep the Vercel Root Directory set to `.` so this configuration and the npm workspace lockfile are used. The older top-level `public/` directory is not the Vite app's build output.
+The root `vercel.json` pins the install command, build command, output directory, and SPA rewrite to the Vite `index.html`. Keep the Vercel Root Directory set to `.` so the root npm workspace and lockfile are used. The older top-level `public/` directory is not the Vite app's build output.
 
 Add the public frontend build variable `VITE_API_URL` with the Render service URL ending in `/api`, for example `https://your-service.onrender.com/api`. This is a public API address, not a secret. Redeploy the frontend after changing it. In Render, set `FRONTEND_ORIGIN` to the matching Vercel origin (for example, `https://your-project.vercel.app`) so credentialed API requests are accepted. Production session cookies use `SameSite=None; Secure` for the cross-site Vercel-to-Render request.
 
