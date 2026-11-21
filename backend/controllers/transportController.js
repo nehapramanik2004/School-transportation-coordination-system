@@ -18,7 +18,7 @@ export async function bootstrap(req, res) {
   res.json(scopeWorkspace(normalizeDemoTripDates(db), req.user));
 }
 
-function scopeWorkspace(db, user) {
+export function scopeWorkspace(db, user) {
   if (!user || user.role === 'admin') return db;
   if (user.role === 'parent') {
     const student = db.students.find(item => item.id === user.studentId);
@@ -181,6 +181,38 @@ export async function createRoute(req, res) {
   await writeDatabase(db); res.status(201).json(route);
 }
 
+export function assignRouteCrew(db, route, driverId, busId) {
+  const driver = driverId ? find(db.drivers, driverId, 'Driver') : null;
+  const bus = busId ? find(db.buses, busId, 'Bus') : null;
+
+  if (route.driverId && route.driverId !== driverId) {
+    const previousDriver = db.drivers.find(item => item.id === route.driverId);
+    if (previousDriver?.routeId === route.id) previousDriver.routeId = null;
+  }
+  if (route.busId && route.busId !== busId) {
+    const previousBus = db.buses.find(item => item.id === route.busId);
+    if (previousBus?.routeId === route.id) previousBus.routeId = null;
+  }
+  if (driver) {
+    const previousRoute = db.routes.find(item => item.id !== route.id && item.driverId === driver.id);
+    if (previousRoute) previousRoute.driverId = null;
+    route.driverId = driver.id;
+    driver.routeId = route.id;
+    driver.busId = bus?.id || null;
+  } else {
+    route.driverId = null;
+  }
+  if (bus) {
+    const previousRoute = db.routes.find(item => item.id !== route.id && item.busId === bus.id);
+    if (previousRoute) previousRoute.busId = null;
+    route.busId = bus.id;
+    bus.routeId = route.id;
+  } else {
+    route.busId = null;
+  }
+  return { driver, bus };
+}
+
 export async function updateRoute(req, res) {
   const db = await readDatabase(); const route = find(db.routes, req.params.id, 'Route');
   const previousBusId = route.busId;
@@ -218,8 +250,12 @@ export async function deleteRoute(req, res) {
 
 export async function createTrip(req, res) {
   const db = await readDatabase(); const route = find(db.routes, req.body.routeId, 'Route');
+  const driverId = req.body.driverId || route.driverId;
+  const busId = req.body.busId || route.busId;
+  assignRouteCrew(db, route, driverId, busId);
   const attendance = Object.fromEntries(db.students.filter(student => student.routeId === route.id).map(student => [student.id, 'Upcoming']));
-  const trip = { id: makeId('trip'), ...req.body, date: req.body.date || schoolDateKey(), status: 'Scheduled', startedAt: null, attendance, simulated: true };
+  const { driverId: _driverId, busId: _busId, ...tripDetails } = req.body;
+  const trip = { id: makeId('trip'), ...tripDetails, date: req.body.date || schoolDateKey(), status: 'Scheduled', startedAt: null, attendance, simulated: true };
   db.trips.unshift(trip); await writeDatabase(db); res.status(201).json(trip);
 }
 
