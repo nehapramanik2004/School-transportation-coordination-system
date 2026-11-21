@@ -1,3 +1,5 @@
+import { fetchWithRetry } from './fetchWithRetry.js';
+
 const configuredApiBase = import.meta.env.VITE_API_URL?.trim();
 const API_BASE = (configuredApiBase || (import.meta.env.DEV ? 'http://localhost:3000/api' : '')).replace(/\/+$/, '');
 
@@ -6,12 +8,15 @@ export async function api(path, options = {}) {
     throw new Error('Backend API is not configured. Set VITE_API_URL to your Render service URL ending in /api, then redeploy the Vercel frontend.');
   }
   let response;
+  const method = (options.method || 'GET').toUpperCase();
+  const retryable = ['GET', 'HEAD', 'OPTIONS'].includes(method)
+    || /^\/auth\/(mode|session|login|demo-login|logout)$/.test(path);
   try {
-    response = await fetch(`${API_BASE}${path.startsWith('/') ? path : `/${path}`}`, {
+    response = await fetchWithRetry(fetch, `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`, {
       ...options,
       credentials: 'include',
       headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...options.headers }
-    });
+    }, { retries: retryable ? 1 : 0 });
   } catch {
     throw new Error(`Cannot reach the backend at ${API_BASE}. Check that the Render service is running, VITE_API_URL is correct, and Render FRONTEND_ORIGIN allows this Vercel domain.`);
   }
