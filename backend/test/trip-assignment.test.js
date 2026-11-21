@@ -1,6 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { assignRouteCrew, scopeWorkspace } from '../controllers/transportController.js';
+import { currentTrip, tripsForRouteOnDate } from '../../frontend/src/utils/dashboard.js';
+
+test('Driver dashboard includes a new scheduled trip alongside an existing in-progress trip', () => {
+  const data = { trips: [
+    { id: 'trip-active', routeId: 'route-1', date: '2026-11-21', status: 'In progress' },
+    { id: 'trip-new', routeId: 'route-1', date: '2026-11-21', status: 'Scheduled' },
+    { id: 'trip-other-route', routeId: 'route-2', date: '2026-11-21', status: 'Scheduled' }
+  ] };
+
+  assert.equal(currentTrip(data, 'route-1', '2026-11-21').id, 'trip-active', 'active trip remains the dashboard control target');
+  assert.deepEqual(tripsForRouteOnDate(data, 'route-1', '2026-11-21').map(trip => trip.id), ['trip-active', 'trip-new']);
+});
 
 test('Admin trip assignment persists the chosen driver and vehicle through the route workspace', () => {
   const db = {

@@ -1,9 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { cp, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { schoolDateKey } from '../utils/schoolDate.js';
 
 const backendDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const sourceDatabase = path.join(backendDir, 'data', 'db.json');
@@ -22,6 +23,11 @@ test('Admin trip assignment is available to the Driver after a fresh API load', 
   try {
     const isolatedBackend = path.join(tempDir, 'backend');
     await cp(backendDir, isolatedBackend, { recursive: true, filter: source => !source.includes('.trip-assignment-e2e-') });
+    const isolatedDatabase = path.join(isolatedBackend, 'data', 'db.json');
+    const fixture = JSON.parse(await readFile(isolatedDatabase, 'utf8'));
+    fixture.settings.demoMode = true;
+    fixture.trips.unshift({ id: 'trip-existing-active', routeId: 'route-3', date: schoolDateKey(), type: 'Morning pickup', eta: '8:00 AM', status: 'In progress', startedAt: new Date().toISOString(), attendance: {}, simulated: true });
+    await writeFile(isolatedDatabase, JSON.stringify(fixture, null, 2), 'utf8');
     const { createApp } = await import(`${pathToFileURL(path.join(isolatedBackend, 'server.js')).href}?test=${Date.now()}`);
     server = createApp().listen(0);
     await new Promise(resolve => server.once('listening', resolve));
@@ -55,6 +61,7 @@ test('Admin trip assignment is available to the Driver after a fresh API load', 
     assert.deepEqual(workspace.routes.map(route => route.id), ['route-3']);
     assert.deepEqual(workspace.buses.map(bus => bus.id), ['bus-3']);
     assert.ok(workspace.trips.some(item => item.id === trip.id));
+    assert.equal(workspace.trips.find(item => item.id === 'trip-existing-active').status, 'In progress');
 
     const refreshed = await (await call('/bootstrap', { headers: { cookie: driverCookie } })).json();
     assert.ok(refreshed.trips.some(item => item.id === trip.id), 'created trip is still present after a new workspace request');
