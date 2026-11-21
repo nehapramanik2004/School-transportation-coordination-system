@@ -20,6 +20,7 @@ export default function App() {
   const [page, setPage] = useState('overview');
   const [session, setSession] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [parentWorkspaceLoading, setParentWorkspaceLoading] = useState(false);
   const [demoModeAvailable, setDemoModeAvailable] = useState(false);
   const [authError, setAuthError] = useState('');
   const [childId, setChildId] = useState('stu-1');
@@ -81,12 +82,18 @@ export default function App() {
   async function handleLogin(credentials) {
     setAuthError('');
     const result = demoModeAvailable ? await demoSignIn(credentials) : await signIn(credentials);
+    const isParent = result.user.role === 'parent';
+    if (isParent) {
+      setData(null);
+      setParentWorkspaceLoading(true);
+    }
     setSession(result.user);
     if (result.user.studentId) setChildId(result.user.studentId);
     if (result.user.driverId) setDriverId(result.user.driverId);
     setPage('overview'); setDialog(null); setLoadError('');
     try { const workspace = await loadWorkspace(); setData(workspace); }
     catch (error) { setLoadError(error.message); }
+    finally { if (isParent) setParentWorkspaceLoading(false); }
   }
 
   async function handleLogout() {
@@ -154,6 +161,7 @@ export default function App() {
 
   let content;
   if (page === 'login') content = <Login onLogin={handleLogin} demoMode={demoModeAvailable} initialError={authError}/>;
+  else if (parentWorkspaceLoading) content = <section className="panel"><div className="loading"><span className="spinner"/> Loading Parent dashboard</div></section>;
   else if (!data) content = <section className="panel connection-error"><div className="panel-title">Dashboard is ready when the API is available</div><p>{loadError || authError || 'The API has not returned workspace data.'}</p><div className="heading-actions"><button className="button button-primary" onClick={refresh}>Retry dashboard</button><button className="button" onClick={() => setPage('login')}>Open Login</button></div></section>;
   else if (page === 'overview') content = <Overview role={role} data={data} childId={childId} setChildId={setChildId} driverId={driverId} setDriverId={setDriverId} notify={notify} mutate={mutate} openDialog={openDialog}/>;
   else if (['students','drivers','routes'].includes(page) && role === 'admin') content = <Management page={page} data={data} openDialog={openDialog} mutate={mutate}/>;

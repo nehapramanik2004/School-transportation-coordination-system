@@ -1,6 +1,7 @@
-const today = () => new Date().toISOString().slice(0, 10);
+import { offsetSchoolDate, schoolDateKey } from '../utils/schoolDate.js';
 
 export function createSeed() {
+  const today = schoolDateKey();
   return {
     students: [
       { id: 'stu-1', name: 'Aarav Mehta', grade: 'Grade 4 · A', parent: 'Priya Mehta', phone: '+91 98765 43210', routeId: 'route-1', stop: 'Lakeview Apartments', pickup: '7:35 AM', avatar: 'AM', active: true },
@@ -27,10 +28,10 @@ export function createSeed() {
       { id: 'route-3', name: 'Cedar Grove Route', color: 'orange', busId: 'bus-3', driverId: 'drv-3', stops: ['Cedar Lane', 'Sunrise Enclave', 'Oakwood Circle', 'Northview School'], students: 2, startTime: '7:20 AM', duration: '45 min', status: 'Active' }
     ],
     trips: [
-      { id: 'trip-1', routeId: 'route-1', date: today(), type: 'Morning pickup', status: 'In progress', startedAt: new Date(Date.now() - 17 * 60000).toISOString(), eta: '8:18 AM', attendance: { 'stu-1': 'Picked up', 'stu-2': 'Upcoming' }, simulated: true },
-      { id: 'trip-2', routeId: 'route-2', date: today(), type: 'Morning pickup', status: 'In progress', startedAt: new Date(Date.now() - 12 * 60000).toISOString(), eta: '8:22 AM', attendance: { 'stu-3': 'Picked up', 'stu-4': 'Upcoming' }, simulated: true },
-      { id: 'trip-3', routeId: 'route-3', date: today(), type: 'Morning pickup', status: 'Scheduled', startedAt: null, eta: '8:30 AM', attendance: { 'stu-5': 'Upcoming', 'stu-6': 'Upcoming' }, simulated: true },
-      { id: 'trip-4', routeId: 'route-1', date: new Date(Date.now() - 86400000).toISOString().slice(0, 10), type: 'Afternoon drop', status: 'Completed', startedAt: new Date(Date.now() - 86400000 + 9 * 3600000).toISOString(), eta: '3:42 PM', attendance: { 'stu-1': 'Dropped off', 'stu-2': 'Dropped off' }, simulated: true }
+      { id: 'trip-1', routeId: 'route-1', date: today, type: 'Morning pickup', status: 'In progress', startedAt: new Date(Date.now() - 17 * 60000).toISOString(), eta: '8:18 AM', attendance: { 'stu-1': 'Picked up', 'stu-2': 'Upcoming' }, simulated: true },
+      { id: 'trip-2', routeId: 'route-2', date: today, type: 'Morning pickup', status: 'In progress', startedAt: new Date(Date.now() - 12 * 60000).toISOString(), eta: '8:22 AM', attendance: { 'stu-3': 'Picked up', 'stu-4': 'Upcoming' }, simulated: true },
+      { id: 'trip-3', routeId: 'route-3', date: today, type: 'Morning pickup', status: 'Scheduled', startedAt: null, eta: '8:30 AM', attendance: { 'stu-5': 'Upcoming', 'stu-6': 'Upcoming' }, simulated: true },
+      { id: 'trip-4', routeId: 'route-1', date: offsetSchoolDate(today, -1), type: 'Afternoon drop', status: 'Completed', startedAt: new Date(Date.now() - 86400000 + 9 * 3600000).toISOString(), eta: '3:42 PM', attendance: { 'stu-1': 'Dropped off', 'stu-2': 'Dropped off' }, simulated: true }
     ],
     alerts: [
       { id: 'alert-1', type: 'Pickup', title: 'Aarav was picked up', detail: 'Lakeview Apartments · Bus 01', time: new Date(Date.now() - 5 * 60000).toISOString(), read: false },

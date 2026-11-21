@@ -1,16 +1,10 @@
 ﻿import { randomUUID } from 'node:crypto';
 import { readDatabase, writeDatabase } from '../data/database.js';
 import { HttpError } from '../middleware/errors.js';
+import { normalizeDemoTripDates, schoolDateKey } from '../utils/schoolDate.js';
 
 const makeId = prefix => `${prefix}-${randomUUID().slice(0, 8)}`;
 const initials = name => name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
-const today = () => {
-  const parts = new Intl.DateTimeFormat('en', {
-    timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(new Date());
-  const values = Object.fromEntries(parts.map(part => [part.type, part.value]));
-  return `${values.year}-${values.month}-${values.day}`;
-};
 const find = (items, id, label) => {
   const value = items.find(item => item.id === id);
   if (!value) throw new HttpError(404, `${label} not found`);
@@ -21,7 +15,7 @@ const recalculateStudents = db => db.routes.forEach(route => { route.students = 
 export async function bootstrap(req, res) {
   const db = await readDatabase();
   recalculateStudents(db);
-  res.json(scopeWorkspace(db, req.user));
+  res.json(scopeWorkspace(normalizeDemoTripDates(db), req.user));
 }
 
 function scopeWorkspace(db, user) {
@@ -68,11 +62,12 @@ function assertDriverOwnsTrip(db, user, trip) {
 
 export async function summary(req, res) {
   const db = await readDatabase();
+  const trips = normalizeDemoTripDates(db).trips;
   res.json({
     totalStudents: db.students.filter(student => student.active).length,
     totalBuses: db.buses.length,
     activeRoutes: db.routes.filter(route => route.status === 'Active').length,
-    todaysTrips: db.trips.filter(trip => trip.date === today()).length,
+    todaysTrips: trips.filter(trip => trip.date === schoolDateKey()).length,
     tripsInProgress: db.trips.filter(trip => trip.status === 'In progress').length,
     unreadAlerts: db.alerts.filter(alert => !alert.read).length
   });
@@ -81,7 +76,8 @@ export async function summary(req, res) {
 export function list(resource) {
   return async (req, res) => {
     const db = await readDatabase();
-    res.json(scopeWorkspace(db, req.user)[resource] || []);
+    const workspace = resource === 'trips' ? normalizeDemoTripDates(db) : db;
+    res.json(scopeWorkspace(workspace, req.user)[resource] || []);
   };
 }
 
@@ -223,7 +219,7 @@ export async function deleteRoute(req, res) {
 export async function createTrip(req, res) {
   const db = await readDatabase(); const route = find(db.routes, req.body.routeId, 'Route');
   const attendance = Object.fromEntries(db.students.filter(student => student.routeId === route.id).map(student => [student.id, 'Upcoming']));
-  const trip = { id: makeId('trip'), ...req.body, date: req.body.date || today(), status: 'Scheduled', startedAt: null, attendance, simulated: true };
+  const trip = { id: makeId('trip'), ...req.body, date: req.body.date || schoolDateKey(), status: 'Scheduled', startedAt: null, attendance, simulated: true };
   db.trips.unshift(trip); await writeDatabase(db); res.status(201).json(trip);
 }
 
